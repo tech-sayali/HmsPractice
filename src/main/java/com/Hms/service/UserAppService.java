@@ -1,6 +1,7 @@
 package com.Hms.service;
 
 import com.Hms.entity.UserApp;
+import com.Hms.payload.LoginDto;
 import com.Hms.payload.UserAppDto;
 import com.Hms.repository.UserAppRepository;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,31 +26,31 @@ public class UserAppService {
     public ResponseEntity<?> createUser(UserAppDto userAppDto) {
         Optional<UserApp> username = userAppRepository.findByUsername(userAppDto.getUsername());
 
-        if(username.isPresent()){
+        if (username.isPresent()) {
             return new ResponseEntity<>("Username already Present", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        }
 
         Optional<UserApp> password = userAppRepository.findByPassword(userAppDto.getPassword());
 
-        if(password.isPresent()){
-            return new ResponseEntity<>("Password already Present",HttpStatus.INTERNAL_SERVER_ERROR);
+        if (password.isPresent()) {
+            return new ResponseEntity<>("Password already Present", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        UserApp user=mapToEntity(userAppDto);
+        UserApp user = mapToEntity(userAppDto);
 
-        user.setPassword(BCrypt.hashpw(userAppDto.getPassword(),BCrypt.gensalt(4)));
+        user.setPassword(BCrypt.hashpw(userAppDto.getPassword(), BCrypt.gensalt(4)));
         UserApp save = userAppRepository.save(user);
         UserAppDto dto = mapToDto(save);
 
-        return new ResponseEntity<>(dto,HttpStatus.CREATED);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    UserApp mapToEntity(UserAppDto userAppDto){
+    UserApp mapToEntity(UserAppDto userAppDto) {
         UserApp user = modelMapper.map(userAppDto, UserApp.class);
         return user;
     }
 
-    UserAppDto mapToDto(UserApp userApp){
+    UserAppDto mapToDto(UserApp userApp) {
         UserAppDto dto = modelMapper.map(userApp, UserAppDto.class);
         return dto;
     }
@@ -56,26 +59,38 @@ public class UserAppService {
         userAppRepository.deleteById(id);
     }
 
-    public ResponseEntity<UserAppDto> updateUser(long id,UserAppDto userAppDto) {
+    public ResponseEntity<UserAppDto> updateUser(long id, UserAppDto userAppDto) {
         UserApp user = userAppRepository.findById(id).get();
         user.setName(userAppDto.getName());
         user.setEmail(user.getEmail());
         user.setUsername(userAppDto.getUsername());
-        user.setPassword(BCrypt.hashpw(userAppDto.getPassword(),BCrypt.gensalt(4)));
+        user.setPassword(BCrypt.hashpw(userAppDto.getPassword(), BCrypt.gensalt(4)));
         UserApp save = userAppRepository.save(user);
         UserAppDto dto = mapToDto(save);
-        return new ResponseEntity<>(dto,HttpStatus.OK);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     public ResponseEntity<UserAppDto> findUserById(long id) {
         UserApp user = userAppRepository.findById(id).get();
         UserAppDto dto = mapToDto(user);
-        return new ResponseEntity<>(dto,HttpStatus.OK);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     public ResponseEntity<List<UserAppDto>> listUser() {
         List<UserApp> all = userAppRepository.findAll();
         List<UserAppDto> collect = all.stream().map(this::mapToDto).collect(Collectors.toList());
-        return new ResponseEntity<>(collect,HttpStatus.OK);
+        return new ResponseEntity<>(collect, HttpStatus.OK);
     }
+
+
+    public boolean verifyLogin(LoginDto loginDto) {
+        Optional<UserApp> username = userAppRepository.findByUsername(loginDto.getUsername());
+        if (username.isPresent()) {
+            UserApp user = username.get();
+            return BCrypt.checkpw(loginDto.getPassword(), user.getPassword());
+        } else {
+            return false;
+        }
+    }
+
 }

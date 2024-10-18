@@ -1,6 +1,7 @@
 package com.Hms.controller;
 
 import com.Hms.entity.UserApp;
+import com.Hms.payload.LoginDto;
 import com.Hms.payload.UserAppDto;
 import com.Hms.service.UserAppService;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,18 @@ public class UserAppController {
     @GetMapping
     public ResponseEntity<List<UserAppDto>> listAll(){
         return userAppService.listUser();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(
+            @RequestBody LoginDto loginDto
+    ){
+        boolean status = userAppService.verifyLogin(loginDto);
+        if(status){
+            return new ResponseEntity<>("User Logged in",HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>("Invalid Username/Password",HttpStatus.FORBIDDEN);
+        }
     }
 }
 
