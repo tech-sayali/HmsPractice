@@ -1,13 +1,15 @@
 package com.Hms.controller;
 
+import com.Hms.entity.UserApp;
 import com.Hms.payload.UserAppDto;
 import com.Hms.service.UserAppService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -21,4 +23,34 @@ public class UserAppController {
     ){
         return userAppService.createUser(userAppDto);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(
+            @PathVariable("id") long id
+    ){
+        userAppService.deleteById(id);
+        return new ResponseEntity<>("Record Deleted", HttpStatus.OK);
+    }
+
+    @PutMapping()
+    public ResponseEntity<UserAppDto> updateUser(
+            @RequestParam("id") long id,
+            @RequestBody UserAppDto userAppDto
+    ){
+        return userAppService.updateUser(id,userAppDto);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserAppDto> findUser(
+            @PathVariable("id") long id
+    ){
+        return userAppService.findUserById(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserAppDto>> listAll(){
+        return userAppService.listUser();
+    }
 }
+
+
