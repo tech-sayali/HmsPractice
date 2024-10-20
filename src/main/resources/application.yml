@@ -7,3 +7,28 @@ spring:
     hibernate:
       ddl-auto: update
   show-sql: true
+
+
+  mail:
+    host: smtp.gmail.com       # SMTP server (e.g., Gmail's SMTP server)
+    port: 587                  # Port (587 is for TLS, 465 is for SSL)
+    username: sayaligholap1309@gmail.com   # Your email address
+    password: kzgfecdhwvjatfzl         # Your email password (use App Passwords for Gmail)
+    properties:
+      mail:
+        smtp:
+          auth: true           # Enable authentication
+          starttls:
+            enable: true       # Enable STARTTLS
+          ssl:
+            trust: smtp.gmail.com  # Trust the SMTP server
+
+
+jwt:
+  algorithm:
+    key: testingabcdefghijklmnopqrstuvwxyz
+  issuer: sayali
+  expiry:
+    duration: 86400000
+
+

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/api/v6/user")
+@RequestMapping("/api/v1/user")
 public class UserAppController {
     private UserAppService userAppService;
 
@@ -57,9 +57,9 @@ public class UserAppController {
     public ResponseEntity<String> login(
             @RequestBody LoginDto loginDto
     ){
-        boolean status = userAppService.verifyLogin(loginDto);
-        if(status){
-            return new ResponseEntity<>("User Logged in",HttpStatus.OK);
+        String token = userAppService.verifyLogin(loginDto);
+        if(token!=null){
+            return new ResponseEntity<>(token,HttpStatus.OK);
         }else {
             return new ResponseEntity<>("Invalid Username/Password",HttpStatus.FORBIDDEN);
         }
